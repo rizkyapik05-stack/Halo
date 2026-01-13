@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Chat With U</title>
+  <style>
+    body { font-family: Arial; padding: 10px; }
+    #chat { border:1px solid #ccc; height:260px; overflow:auto; padding:5px; }
+    input, button { width:100%; padding:10px; margin-top:5px; }
+  </style>
+</head>
+<body>
+
+<h3>Chat 2 HP</h3>
+
+<input id="nama" placeholder="Nama">
+<input id="room" placeholder="Kode (contoh: 66)">
+<button onclick="join()">Masuk</button>
+
+<div id="chat"></div>
+
+<input id="pesan" placeholder="Pesan">
+<button onclick="kirim()">Kirim</button>
+
+<script>
+  let ws;
+  let nama;
+  let room;
+
+  function join(){
+    nama = document.getElementById("nama").value;
+    room = document.getElementById("room").value;
+
+    if(!nama || !room){
+      alert("Isi nama dan kode kamar!");
+      return;
+    }
+
+    alert("Berhasil masuk ke chat ihi: " + room);
+
+    ws = new WebSocket("wss://echo.websocket.events");
+
+    ws.onmessage = e => {
+      if(e.data.startsWith(room + "|")){
+        tampil("Teman", e.data.replace(room + "|", ""));
+      }
+    };
+  }
+
+  function kirim(){
+    let msg = document.getElementById("pesan").value;
+    if(ws && msg){
+      ws.send(room + "|" + nama + ": " + msg);
+      tampil("Saya", nama + ": " + msg);
+      document.getElementById("pesan").value = "";
+    }
+  }
+
+  function tampil(pengirim, teks){
+    document.getElementById("chat").innerHTML +=
+      `<p><b>${pengirim}:</b> ${teks}</p>`;
+  }
+</script>
+
+</body>
+</html><!
